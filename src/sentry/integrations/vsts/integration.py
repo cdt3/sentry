@@ -92,7 +92,7 @@ class VstsIntegration(Integration, VstsIssueSync):
     @property
     def default_project(self):
         try:
-            return self.model.metadata['default_project']['name']
+            return self.model.metadata['default_project']
         except KeyError:
             return None
 
@@ -142,10 +142,8 @@ class VstsIntegrationProvider(IntegrationProvider):
             'metadata': {
                 'domain_name': instance,
                 'scopes': scopes,
-                'default_project': {
-                    'name': project['name'],
-                    'id': project['id'],
-                }
+                'default_project': project['id'],
+
                 # icon doesn't appear to be possible
             },
             # TODO(LB): Change this to a Microsoft account as opposed to a VSTS workspace
