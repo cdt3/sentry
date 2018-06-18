@@ -403,7 +403,7 @@ const projectSettingsRoutes = (
       path="integrations/:providerKey/"
       name="Integration Configuration"
       componentPromise={() =>
-        import(/* webpackChunkName: "OrganizationIntegration" */ './views/organizationIntegration')}
+        import(/* webpackChunkName: "Integration" */ './views/settings/organizationIntegrations/integration')}
       component={errorHandler(LazyLoad)}
     />
     <Route
@@ -572,6 +572,28 @@ function routes() {
             component={errorHandler(LazyLoad)}
           />
         </Route>
+      </Route>
+
+      <Route name="Integrations" path="integrations/">
+        <IndexRoute
+          componentPromise={() =>
+            import(/*webpackChunkName: OrganizationIntegrations*/ './views/organizationIntegrations')}
+          component={errorHandler(LazyLoad)}
+        />
+        <Route
+          name="Integration"
+          path=":providerKey/"
+          componentPromise={() =>
+            import(/*webpackChunkName: Integration*/ './views/settings/organizationIntegrations/integration')}
+          component={errorHandler(LazyLoad)}
+        />
+        <Route
+          name="Configure Integration"
+          path=":providerKey/:integrationId/"
+          componentPromise={() =>
+            import(/*webpackChunkName: ConfigureIntegration*/ './views/settings/organizationIntegrations/configureIntegration')}
+          component={errorHandler(LazyLoad)}
+        />
       </Route>
     </React.Fragment>
   );
