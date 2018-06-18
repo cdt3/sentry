@@ -78,7 +78,7 @@ class VstsIntegration(Integration):
         if self.default_identity is None:
             self.default_identity = self.get_default_identity()
 
-        return VstsApiClient(self.default_identity)
+        return VstsApiClient(self.default_identity, VstsIntegrationProvider.oauth_redirect_url)
 
 
 class VstsIntegrationProvider(IntegrationProvider):
@@ -87,6 +87,7 @@ class VstsIntegrationProvider(IntegrationProvider):
     metadata = metadata
     domain = '.visualstudio.com'
     api_version = '4.1'
+    oauth_redirect_url = '/extensions/vsts/setup/'
     needs_default_identity = True
     integration_cls = VstsIntegration
 
@@ -97,7 +98,7 @@ class VstsIntegrationProvider(IntegrationProvider):
 
     def get_pipeline_views(self):
         identity_pipeline_config = {
-            'redirect_url': absolute_uri(VSTSIdentityProvider.oauth_redirect_url),
+            'redirect_url': absolute_uri(self.oauth_redirect_url),
         }
 
         identity_pipeline_view = NestedPipelineView(
