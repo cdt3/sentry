@@ -30,7 +30,7 @@ exports[`ProjectSavedSearches renders 1`] = `
               >
                 <Title>
                   <div
-                    className="css-zmdcxu-Title e1kblvez2"
+                    className="css-zmdcxu-Title e1kblvez1"
                   >
                     Saved Searches
                   </div>
@@ -795,7 +795,7 @@ exports[`ProjectSavedSearches renders empty 1`] = `
               >
                 <Title>
                   <div
-                    className="css-zmdcxu-Title e1kblvez2"
+                    className="css-zmdcxu-Title e1kblvez1"
                   >
                     Saved Searches
                   </div>
