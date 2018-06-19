@@ -33,6 +33,7 @@ from sentry.tasks.store import preprocess_event, \
     preprocess_event_from_reprocessing
 from sentry.utils import json
 from sentry.utils.auth import parse_auth_header
+from sentry.utils.canonical import CanonicalKeyDict
 from sentry.utils.http import origin_from_request
 from sentry.utils.data_filters import is_valid_ip, \
     is_valid_release, is_valid_error_message, FilterStatKeys
@@ -488,6 +489,9 @@ class LazyData(MutableMapping):
                 data = helper.decode_data(data)
         if isinstance(data, six.text_type):
             data = helper.safely_load_json_string(data)
+
+        # Shim legacy key names, such as "sentry.interfaces.Exception"
+        data = CanonicalKeyDict(data)
 
         # We need data validation/etc to apply as part of LazyData so that
         # if there are filters present, they can operate on a normalized

@@ -22,6 +22,7 @@ from sentry.db.models import (
 )
 from sentry.interfaces.base import get_interfaces
 from sentry.utils.cache import memoize
+from sentry.utils.canonical import CanonicalKeyDict
 from sentry.utils.strings import truncatechars
 
 
@@ -43,6 +44,7 @@ class Event(Model):
         null=True,
         ref_func=lambda x: x.project_id or x.project.id,
         ref_version=2,
+        data_wrapper=CanonicalKeyDict,
     )
 
     objects = BaseManager()
@@ -152,7 +154,7 @@ class Event(Model):
         return None
 
     def get_interfaces(self):
-        return get_interfaces(self.data)
+        return CanonicalKeyDict(get_interfaces(self.data))
 
     @memoize
     def interfaces(self):

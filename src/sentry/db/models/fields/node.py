@@ -38,7 +38,7 @@ class NodeIntegrityFailure(Exception):
 
 
 class NodeData(collections.MutableMapping):
-    def __init__(self, field, id, data=None):
+    def __init__(self, field, id, data=None, data_wrapper=None):
         self.field = field
         self.id = id
         self.ref = None
@@ -46,6 +46,9 @@ class NodeData(collections.MutableMapping):
         # (this does not mean the Event is mutable, it just removes ref checking
         #  in the case of something changing on the data model)
         self.ref_version = None
+        self.data_wrapper = data_wrapper
+        if data is not None and data_wrapper is not None:
+            data = data_wrapper(data)
         self._node_data = data
 
     def __getitem__(self, key):
@@ -100,6 +103,8 @@ class NodeData(collections.MutableMapping):
             raise NodeIntegrityFailure(
                 'Node reference for %s is invalid: %s != %s' % (self.id, ref, self.ref, )
             )
+        if data is not None and self.data_wrapper is not None:
+            data = self.data_wrapper(data)
         self._node_data = data
 
     def bind_ref(self, instance):
@@ -115,9 +120,10 @@ class NodeField(GzippedDictField):
     to an external node.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, data_wrapper=NodeData, *args, **kwargs):
         self.ref_func = kwargs.pop('ref_func', None)
         self.ref_version = kwargs.pop('ref_version', None)
+        self.data_wrapper = data_wrapper
         super(NodeField, self).__init__(*args, **kwargs)
 
     def contribute_to_class(self, cls, name):
@@ -148,7 +154,7 @@ class NodeField(GzippedDictField):
             node_id = None
             data = value
 
-        return NodeData(self, node_id, data)
+        return NodeData(self, node_id, data, data_wrapper=self.data_wrapper)
 
     def get_prep_value(self, value):
         if not value and self.null:

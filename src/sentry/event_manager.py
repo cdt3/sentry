@@ -40,6 +40,7 @@ from sentry.tasks.merge import merge_group
 from sentry.tasks.post_process import post_process_group
 from sentry.utils import metrics
 from sentry.utils.cache import default_cache
+from sentry.utils.canonical import CanonicalKeyDict
 from sentry.utils.db import get_db_engine
 from sentry.utils.safe import safe_execute, trim, trim_dict, get_path
 from sentry.utils.strings import truncatechars
@@ -309,7 +310,7 @@ class EventManager(object):
     logger = logging.getLogger('sentry.events')
 
     def __init__(self, data, version='5'):
-        self.data = data.copy()
+        self.data = CanonicalKeyDict(data)
         self.version = version
 
     def normalize(self, request_env=None):
@@ -352,15 +353,12 @@ class EventManager(object):
             'tags': lambda v: [(text(v_k).replace(' ', '-').strip(), text(v_v).strip()) for (v_k, v_v) in dict(v).items()],
             'timestamp': lambda v: process_timestamp(v),
             'platform': lambda v: v if v in VALID_PLATFORMS else 'other',
-            'sentry.interfaces.Message': lambda v: v if isinstance(v, dict) else {'message': v},
+            'logentry': lambda v: v if isinstance(v, dict) else {'message': v},
 
             # These can be sent as lists and need to be converted to {'values': [...]}
             'exception': to_values,
-            'sentry.interfaces.Exception': to_values,
             'breadcrumbs': to_values,
-            'sentry.interfaces.Breadcrumbs': to_values,
             'threads': to_values,
-            'sentry.interfaces.Threads': to_values,
         }
 
         for c in casts:
